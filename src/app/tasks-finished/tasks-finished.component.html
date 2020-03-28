@@ -1,0 +1,22 @@
+<div class="row">
+  <div class="col-md-12 col-sm-12">
+    <table class="table table-stripped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Total Time Expended</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let task of Tasks" >
+          <td>{{task.name}}</td>
+          <td>{{task.hours}}:{{task.minutes}}:{{task.seconds}}</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>{{taskTotalTime}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
