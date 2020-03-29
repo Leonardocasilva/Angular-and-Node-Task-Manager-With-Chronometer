@@ -40,14 +40,16 @@ export class TasksFinishedComponent implements OnInit {
 
     calculator = this.remainDecimals(seconds / 60);
 
+    RemainMinutes += calculator.integer;
+
     while (calculator.decimal >= 60) {
-      RemainMinutes += calculator.integer;
       calculator = this.remainDecimals(calculator.decimal / 60);
 
+      if (calculator.integer > 0) {
+        RemainMinutes += calculator.integer;
+      }
+
       if (calculator.decimal < 60) {
-        if (calculator.integer > 0) {
-          RemainMinutes += calculator.integer;
-        }
         RemainSeconds = calculator.decimal;
         break;
       }
@@ -55,14 +57,16 @@ export class TasksFinishedComponent implements OnInit {
 
     calculator = this.remainDecimals((RemainMinutes + minutes) / 60);
 
+    RemainHours += calculator.integer;
+
     while (calculator.decimal >= 60) {
-      RemainHours += calculator.integer;
       calculator = this.remainDecimals(calculator.decimal / 60);
 
+      if (calculator.integer > 0) {
+        RemainHours += calculator.integer;
+      }
+
       if (calculator.decimal < 60) {
-        if (calculator.integer > 0) {
-          RemainHours += calculator.integer;
-        }
         RemainMinutes = calculator.decimal;
         break;
       }

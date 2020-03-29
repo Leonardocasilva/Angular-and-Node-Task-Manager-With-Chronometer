@@ -19,7 +19,7 @@
 
   .sidebar-header {
     padding: 20px;
-    background: #6d7fcc;
+    background: #343a40;
     border-bottom: 2px solid #fff;
   }
 
@@ -34,7 +34,7 @@
   }
 
   ul {
-    background-color: #6d7fcc;
+    background-color: #343a40;
 
     &.components {
       height: 100%;
@@ -52,14 +52,14 @@
       }
 
       a:hover {
-        color: #7386D5;
+        color: #343a40;
         background: #fff;
       }
 
       &.active {
         >a {
           color: #fff;
-          background: #6d7fcc;
+          background: #343a40;
         }
       }
     }
@@ -71,7 +71,7 @@ ul {
     a {
       font-size: 0.9em !important;
       padding-left: 30px !important;
-      background: #6d7fcc;
+      background: #343a40;
     }
   }
 }
