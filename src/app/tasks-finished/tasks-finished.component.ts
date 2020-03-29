@@ -11,8 +11,7 @@ export class TasksFinishedComponent implements OnInit {
   Tasks: Array<TaskModel> = [];
   taskTotalTime: string;
 
-
-  constructor(private service: AppService) { }
+  constructor(private service: AppService) {}
 
   ngOnInit(): void {
     this.Tasks = this.service.getCookie();
@@ -22,16 +21,38 @@ export class TasksFinishedComponent implements OnInit {
     let hours = 0;
 
     this.Tasks.forEach(t => {
-      seconds += parseInt(t.seconds, 10);
-      minutes += parseInt(t.minutes, 10);
-      hours += parseInt(t.minutes, 10);
+      seconds += parseFloat(t.seconds);
+      minutes += parseFloat(t.minutes);
+      hours += parseFloat(t.hours);
     });
 
-    let RemainSeconds = (seconds / 60).toString();
-    let RemainMinutes = Math.floor(seconds / 60) + minutes;
-    let RemainHours = hours +  Math.floor(minutes);
+    let RemainSeconds = (seconds / 60 - Math.floor(seconds / 60))
+      .toString()
+      .substr(2, 2);
 
-    console.log(RemainSeconds);
+    let RemainMinutes = (
+      (Math.floor(seconds / 60) + minutes) / 60 -
+      Math.floor((Math.floor(seconds / 60) + minutes) / 60)
+    )
+      .toString()
+      .substr(2, 2);
+
+    let RemainHours = Math.floor(
+      hours + (Math.floor(seconds / 60) + minutes) / 60
+    ).toString();
+
+    if (RemainSeconds.length === 1) {
+      RemainSeconds = `0${RemainSeconds}`;
+    }
+
+    if (RemainMinutes.length === 1) {
+      RemainMinutes = `0${RemainMinutes}`;
+    }
+
+    if (RemainHours.length === 1) {
+      RemainHours = `0${RemainHours}`;
+    }
+
+    this.taskTotalTime = `${RemainHours}:${RemainMinutes}:${RemainSeconds}`;
   }
-
 }

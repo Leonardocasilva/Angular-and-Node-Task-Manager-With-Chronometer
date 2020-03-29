@@ -1,0 +1,25 @@
+.icons {
+  padding: 0 1em;
+  cursor: pointer;
+}
+
+.new-task-btn {
+  position: fixed;
+  border-radius: 50%;
+  bottom: 0;
+  margin-right: 5em;
+  margin-bottom: 5em;
+  right: 0;
+  z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .new-task-btn {
+    position: absolute;
+    bottom: unset;
+    margin-top: 1.750em;
+    margin-right: 1em;
+    margin-bottom: 0;
+    top: 0;
+  }
+}
