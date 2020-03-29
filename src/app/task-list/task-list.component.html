@@ -1,27 +1,27 @@
 <div class="container">
-  <button class="btn btn-info new-task-btn" (click)="create()">
-    <fa-icon [icon]="['fas', 'plus']" size="4x"></fa-icon>
+  <button class="btn btn-info new-task-btn" (click)="create()" placement="left" ngbTooltip="Create Task">
+    <fa-icon [icon]="['fas', 'plus']" size="3x"></fa-icon>
   </button>
   <div class="row">
     <div class="col-md-4 col-sm-12" *ngFor="let task of Tasks">
-      <div class="card" style="width: 18rem;">
-        <div class="card-header">
+      <div class="card border-dark" style="width: 18rem;">
+        <div class="card-header bg-dark text-white">
           <h5 class="card-title text-center">{{task.name}}</h5>
         </div>
         <div class="card-body">
           <p class="card-text text-center">{{task.hours}}:{{task.minutes}}:{{task.seconds}}</p>
         </div>
-        <div class="card-footer text-center">
-          <a (click)="StartTask(task.id)">
+        <div class="card-footer text-center bg-dark">
+          <a (click)="StartTask(task.id)" placement="bottom" ngbTooltip="Start / Resume Task">
             <fa-icon [icon]="['fas', 'play-circle']" size="2x" class="card-link text-success icons"></fa-icon>
           </a>
-          <a (click)="StopTask(task.id)">
+          <a (click)="StopTask(task.id)" placement="bottom" ngbTooltip="Stop Task">
             <fa-icon [icon]="['fas', 'stop-circle']" size="2x" class="card-link text-danger icons"></fa-icon>
           </a>
-          <a (click)="edit(task)">
+          <a (click)="edit(task)" placement="bottom" ngbTooltip="Edit Task">
             <fa-icon [icon]="['fas', 'edit']" size="2x" class="card-link text-primary icons"></fa-icon>
           </a>
-          <a (click)="finish(task)">
+          <a (click)="finish(task)" placement="bottom" ngbTooltip="Finish Task">
             <fa-icon [icon]="['fas', 'check-circle']" size="2x" class="card-link text-success icons"></fa-icon>
           </a>
         </div>

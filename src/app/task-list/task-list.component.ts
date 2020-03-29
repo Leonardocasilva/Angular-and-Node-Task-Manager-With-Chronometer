@@ -16,11 +16,11 @@ export class TaskListComponent implements OnInit {
 
   constructor(private service: AppService) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.ValidationTasks();
   }
 
-  creatTask(taskName) {
+  creatTask(taskName): void {
     this.Task = new TaskModel();
 
     this.Task.name = taskName;
@@ -34,7 +34,7 @@ export class TaskListComponent implements OnInit {
     this.service.setCookie(this.Tasks, 'TaskManagerList');
   }
 
-  StopTask(id) {
+  StopTask(id): void {
     clearInterval(this.TaskStarted[id]);
 
     this.Tasks.filter((el, i, arr) => {
@@ -47,7 +47,7 @@ export class TaskListComponent implements OnInit {
     this.service.setCookie(this.Tasks, 'TaskManagerList');
   }
 
-  EditTask(task: TaskModel, newName: string) {
+  EditTask(task: TaskModel, newName: string): void {
     this.Tasks.filter((el, i, arr) => {
       if (el.id === task.id) {
         el.name = newName;
@@ -58,7 +58,7 @@ export class TaskListComponent implements OnInit {
     this.service.setCookie(this.Tasks, 'TaskManagerList');
   }
 
-  StartTask(id) {
+  StartTask(id): void {
     const task = this.Tasks.filter((el, i, arr) => {
       if (el.id === id) {
         el.isNew = false;
@@ -105,7 +105,7 @@ export class TaskListComponent implements OnInit {
     this.TaskStarted[id] = TaskStr;
   }
 
-  ValidationTasks() {
+  ValidationTasks(): void {
     const notDone: Array<any> = [];
 
     try {
@@ -123,7 +123,7 @@ export class TaskListComponent implements OnInit {
     } catch (ex) {}
   }
 
-  create() {
+  create(): void {
     Swal.fire({
       title: 'New Task',
       input: 'text',
@@ -145,7 +145,7 @@ export class TaskListComponent implements OnInit {
     });
   }
 
-  edit(task: TaskModel) {
+  edit(task: TaskModel): void {
     Swal.fire({
       title: 'Edit Task',
       input: 'text',
@@ -168,9 +168,7 @@ export class TaskListComponent implements OnInit {
     });
   }
 
-  finish(task: TaskModel) {
-    let taskDone: Array<TaskModel>;
-
+  finish(task: TaskModel): void {
     Swal.fire({
       title: 'Finish Task',
       text: 'Are you sure that you want finish this task?',

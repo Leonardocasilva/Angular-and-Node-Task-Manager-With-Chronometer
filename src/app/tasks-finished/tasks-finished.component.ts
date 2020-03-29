@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AppService } from '../app.service';
 import { TaskModel } from 'src/Model/TaskModel';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-tasks-finished',
@@ -17,12 +18,8 @@ export class TasksFinishedComponent implements OnInit {
     let seconds = 0;
     let minutes = 0;
     let hours = 0;
-    // TaskManagerList
-    this.Tasks = this.service
-      .getCookie('TaskManagerList')
-      .filter((el, i, arr) => {
-        return el.done === true;
-      });
+
+    this.ValidationTasks();
 
     this.Tasks.forEach(t => {
       seconds += parseFloat(t.seconds);
@@ -31,6 +28,36 @@ export class TasksFinishedComponent implements OnInit {
     });
 
     this.taskTotalTime = this.calculateTotal(hours, minutes, seconds);
+  }
+
+  reopen(task: TaskModel): void {
+    Swal.fire({
+      title: 'Reopen Task',
+      text: 'Are you sure that you want reopen this task?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, do it!'
+    }).then(result => {
+      if (result.value) {
+        this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
+          if (el.id === task.id) {
+            el.done = false;
+            this.Tasks = arr;
+          }
+        });
+
+        this.service.setCookie(this.Tasks, 'TaskManagerList');
+        this.ValidationTasks();
+
+        Swal.fire(
+          'Task Finished',
+          'Your task was finished with success!',
+          'success'
+        );
+      }
+    });
   }
 
   calculateTotal(hours: number, minutes: number, seconds: number): string {
@@ -107,12 +134,20 @@ export class TasksFinishedComponent implements OnInit {
     return ret;
   }
 
-  remainDecimals(num: number) {
+  remainDecimals(num: number): object {
     const ret = num.toString().split('.');
 
     return {
       integer: parseFloat(ret[0]),
       decimal: parseFloat(ret[1].substring(0, 2))
     };
+  }
+
+  ValidationTasks(): void {
+    this.Tasks = this.service
+      .getCookie('TaskManagerList')
+      .filter((el, i, arr) => {
+        return el.done === true;
+      });
   }
 }
