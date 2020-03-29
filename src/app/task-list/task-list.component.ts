@@ -31,7 +31,7 @@ export class TaskListComponent implements OnInit {
 
     this.Tasks.push(this.Task);
 
-    this.service.setCookie(this.Tasks);
+    this.service.setCookie(this.Tasks, 'TaskManagerList');
   }
 
   StopTask(id) {
@@ -44,7 +44,7 @@ export class TaskListComponent implements OnInit {
       }
     });
 
-    this.service.setCookie(this.Tasks);
+    this.service.setCookie(this.Tasks, 'TaskManagerList');
   }
 
   EditTask(task: TaskModel, newName: string) {
@@ -55,7 +55,7 @@ export class TaskListComponent implements OnInit {
       }
     });
 
-    this.service.setCookie(this.Tasks);
+    this.service.setCookie(this.Tasks, 'TaskManagerList');
   }
 
   StartTask(id) {
@@ -99,7 +99,7 @@ export class TaskListComponent implements OnInit {
         }
       });
 
-      this.service.setCookie(this.Tasks);
+      this.service.setCookie(this.Tasks, 'TaskManagerList');
     }, 1000);
 
     this.TaskStarted[id] = TaskStr;
@@ -109,15 +109,11 @@ export class TaskListComponent implements OnInit {
     const notDone: Array<any> = [];
 
     try {
-      this.Tasks = this.service.getCookie();
-
-      this.Tasks.filter((el, i, arr) => {
-        if (!el.done) {
-          notDone.push(el);
-        }
-      });
-
-      this.Tasks = notDone;
+      this.Tasks = this.service
+        .getCookie('TaskManagerList')
+        .filter((el, i, arr) => {
+          return el.done === false;
+        });
 
       this.Tasks.forEach(t => {
         if (t.stopped === false && t.isNew === false) {
@@ -166,6 +162,38 @@ export class TaskListComponent implements OnInit {
         Swal.fire(
           'Task Edited',
           'Your task was edited with success!',
+          'success'
+        );
+      }
+    });
+  }
+
+  finish(task: TaskModel) {
+    let taskDone: Array<TaskModel>;
+
+    Swal.fire({
+      title: 'Finish Task',
+      text: 'Are you sure that you want finish this task?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, do it!'
+    }).then(result => {
+      if (result.value) {
+        this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
+          if (el.id === task.id) {
+            el.done = true;
+            this.Tasks = arr;
+          }
+        });
+
+        this.service.setCookie(this.Tasks, 'TaskManagerList');
+        this.ValidationTasks();
+
+        Swal.fire(
+          'Task Finished',
+          'Your task was finished with success!',
           'success'
         );
       }

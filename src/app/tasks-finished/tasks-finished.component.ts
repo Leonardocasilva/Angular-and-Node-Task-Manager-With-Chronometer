@@ -14,11 +14,15 @@ export class TasksFinishedComponent implements OnInit {
   constructor(private service: AppService) {}
 
   ngOnInit(): void {
-    this.Tasks = this.service.getCookie();
-
     let seconds = 0;
     let minutes = 0;
     let hours = 0;
+    // TaskManagerList
+    this.Tasks = this.service
+      .getCookie('TaskManagerList')
+      .filter((el, i, arr) => {
+        return el.done === true;
+      });
 
     this.Tasks.forEach(t => {
       seconds += parseFloat(t.seconds);
@@ -38,38 +42,46 @@ export class TasksFinishedComponent implements OnInit {
 
     let ret: string;
 
-    calculator = this.remainDecimals(seconds / 60);
+    if (seconds >= 60) {
+      calculator = this.remainDecimals(seconds / 60);
 
-    RemainMinutes += calculator.integer;
+      RemainMinutes += calculator.integer;
 
-    while (calculator.decimal >= 60) {
-      calculator = this.remainDecimals(calculator.decimal / 60);
+      while (calculator.decimal >= 60) {
+        calculator = this.remainDecimals(calculator.decimal / 60);
 
-      if (calculator.integer > 0) {
-        RemainMinutes += calculator.integer;
+        if (calculator.integer > 0) {
+          RemainMinutes += calculator.integer;
+        }
+
+        if (calculator.decimal < 60) {
+          RemainSeconds = calculator.decimal;
+          break;
+        }
       }
-
-      if (calculator.decimal < 60) {
-        RemainSeconds = calculator.decimal;
-        break;
-      }
+    } else {
+      RemainSeconds = seconds;
     }
 
-    calculator = this.remainDecimals((RemainMinutes + minutes) / 60);
+    if (minutes >= 60) {
+      calculator = this.remainDecimals((RemainMinutes + minutes) / 60);
 
-    RemainHours += calculator.integer;
+      RemainHours += calculator.integer;
 
-    while (calculator.decimal >= 60) {
-      calculator = this.remainDecimals(calculator.decimal / 60);
+      while (calculator.decimal >= 60) {
+        calculator = this.remainDecimals(calculator.decimal / 60);
 
-      if (calculator.integer > 0) {
-        RemainHours += calculator.integer;
+        if (calculator.integer > 0) {
+          RemainHours += calculator.integer;
+        }
+
+        if (calculator.decimal < 60) {
+          RemainMinutes = calculator.decimal;
+          break;
+        }
       }
-
-      if (calculator.decimal < 60) {
-        RemainMinutes = calculator.decimal;
-        break;
-      }
+    } else {
+      RemainMinutes = minutes;
     }
 
     RemainHours += hours;

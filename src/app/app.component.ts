@@ -12,12 +12,14 @@ export class AppComponent {
   constructor(private router: Router) {}
 
   collapaseSideNav() {
-    document.querySelector('#sidebar').classList.remove('active');
+    document.querySelector('#sidebar').classList.remove('close');
+    document.querySelector('#sidebar').classList.add('open');
     document.querySelector('.overlay').classList.add('active');
   }
 
   Dimiss() {
-    document.querySelector('#sidebar').classList.add('active');
+    document.querySelector('#sidebar').classList.remove('open');
+    document.querySelector('#sidebar').classList.add('close');
     document.querySelector('.overlay').classList.remove('active');
   }
 
