@@ -26,33 +26,77 @@ export class TasksFinishedComponent implements OnInit {
       hours += parseFloat(t.hours);
     });
 
-    let RemainSeconds = (seconds / 60 - Math.floor(seconds / 60))
-      .toString()
-      .substr(2, 2);
+    this.taskTotalTime = this.calculateTotal(hours, minutes, seconds);
+  }
 
-    let RemainMinutes = (
-      (Math.floor(seconds / 60) + minutes) / 60 -
-      Math.floor((Math.floor(seconds / 60) + minutes) / 60)
-    )
-      .toString()
-      .substr(2, 2);
+  calculateTotal(hours: number, minutes: number, seconds: number): string {
+    let RemainSeconds = 0;
+    let RemainMinutes = 0;
+    let RemainHours = 0;
 
-    let RemainHours = Math.floor(
-      hours + (Math.floor(seconds / 60) + minutes) / 60
-    ).toString();
+    let calculator;
 
-    if (RemainSeconds.length === 1) {
-      RemainSeconds = `0${RemainSeconds}`;
+    let ret: string;
+
+    calculator = this.remainDecimals(seconds / 60);
+
+    while (calculator.decimal >= 60) {
+      RemainMinutes += calculator.integer;
+      calculator = this.remainDecimals(calculator.decimal / 60);
+
+      if (calculator.decimal < 60) {
+        if (calculator.integer > 0) {
+          RemainMinutes += calculator.integer;
+        }
+        RemainSeconds = calculator.decimal;
+        break;
+      }
     }
 
-    if (RemainMinutes.length === 1) {
-      RemainMinutes = `0${RemainMinutes}`;
+    calculator = this.remainDecimals((RemainMinutes + minutes) / 60);
+
+    while (calculator.decimal >= 60) {
+      RemainHours += calculator.integer;
+      calculator = this.remainDecimals(calculator.decimal / 60);
+
+      if (calculator.decimal < 60) {
+        if (calculator.integer > 0) {
+          RemainHours += calculator.integer;
+        }
+        RemainMinutes = calculator.decimal;
+        break;
+      }
     }
 
-    if (RemainHours.length === 1) {
-      RemainHours = `0${RemainHours}`;
+    RemainHours += hours;
+
+    if (RemainHours.toString().length === 1) {
+      ret = `0${RemainHours}`;
+    } else {
+      ret = `${RemainHours}`;
     }
 
-    this.taskTotalTime = `${RemainHours}:${RemainMinutes}:${RemainSeconds}`;
+    if (RemainMinutes.toString().length === 1) {
+      ret += `:0${RemainMinutes}`;
+    } else {
+      ret += `:${RemainMinutes}`;
+    }
+
+    if (RemainSeconds.toString().length === 1) {
+      ret += `:0${RemainSeconds}`;
+    } else {
+      ret += `:${RemainSeconds}`;
+    }
+
+    return ret;
+  }
+
+  remainDecimals(num: number) {
+    const ret = num.toString().split('.');
+
+    return {
+      integer: parseFloat(ret[0]),
+      decimal: parseFloat(ret[1].substring(0, 2))
+    };
   }
 }
