@@ -34,11 +34,11 @@ export class TaskListComponent implements OnInit {
     this.service.setCookie(this.Tasks, 'TaskManagerList');
   }
 
-  StopTask(id): void {
-    clearInterval(this.TaskStarted[id]);
+  StopTask(task: TaskModel): void {
+    clearInterval(this.TaskStarted[task.id]);
 
     this.Tasks.filter((el, i, arr) => {
-      if (el.id === id) {
+      if (el.id === task.id) {
         el.stopped = true;
         this.Tasks = arr;
       }
@@ -58,9 +58,9 @@ export class TaskListComponent implements OnInit {
     this.service.setCookie(this.Tasks, 'TaskManagerList');
   }
 
-  StartTask(id): void {
-    const task = this.Tasks.filter((el, i, arr) => {
-      if (el.id === id) {
+  StartTask(task: TaskModel): void {
+    const taskIn = this.Tasks.filter((el, i, arr) => {
+      if (el.id === task.id) {
         el.isNew = false;
         el.stopped = false;
         return el;
@@ -68,33 +68,33 @@ export class TaskListComponent implements OnInit {
     });
 
     const TaskStr = setInterval(() => {
-      const seconds = parseFloat(task[0].seconds) + 1;
-      const minutes = parseFloat(task[0].minutes) + 1;
-      const hours = parseFloat(task[0].hours) + 1;
+      const seconds = parseFloat(taskIn[0].seconds) + 1;
+      const minutes = parseFloat(taskIn[0].minutes) + 1;
+      const hours = parseFloat(taskIn[0].hours) + 1;
 
-      task[0].seconds =
+      taskIn[0].seconds =
         seconds.toString().length === 1
           ? '0' + seconds.toString()
           : seconds.toString();
 
-      if (task[0].seconds === '60') {
-        task[0].seconds = '00';
-        task[0].minutes =
+      if (taskIn[0].seconds === '60') {
+        taskIn[0].seconds = '00';
+        taskIn[0].minutes =
           minutes.toString().length === 1
             ? '0' + minutes.toString()
             : minutes.toString();
       }
 
-      if (task[0].minutes === '60') {
-        task[0].minutes = '00';
-        task[0].hours =
+      if (taskIn[0].minutes === '60') {
+        taskIn[0].minutes = '00';
+        taskIn[0].hours =
           hours.toString().length === 1
             ? '0' + hours.toString()
             : hours.toString();
       }
 
       this.Tasks.filter((el, i, arr) => {
-        if (el.id === id) {
+        if (el.id === task.id) {
           this.Tasks = arr;
         }
       });
@@ -102,13 +102,14 @@ export class TaskListComponent implements OnInit {
       this.service.setCookie(this.Tasks, 'TaskManagerList');
     }, 1000);
 
-    this.TaskStarted[id] = TaskStr;
+    this.TaskStarted[task.id] = TaskStr;
   }
 
   ValidationTasks(): void {
-    const notDone: Array<any> = [];
-
     try {
+      debugger;
+      let test = this.service.getCookie('TaskManagerList');
+
       this.Tasks = this.service
         .getCookie('TaskManagerList')
         .filter((el, i, arr) => {
@@ -117,7 +118,7 @@ export class TaskListComponent implements OnInit {
 
       this.Tasks.forEach(t => {
         if (t.stopped === false && t.isNew === false) {
-          this.StartTask(t.id);
+          this.StartTask(t);
         }
       });
     } catch (ex) {}
@@ -130,6 +131,9 @@ export class TaskListComponent implements OnInit {
       inputAttributes: {
         autocapitalize: 'off'
       },
+      inputValidator: text =>
+        (text.length >= 18 && 'Max character is 18') ||
+        (text.length < 3 && 'Min Character is 3'),
       showCancelButton: true,
       confirmButtonText: 'Save',
       showLoaderOnConfirm: true,
@@ -153,6 +157,9 @@ export class TaskListComponent implements OnInit {
       inputAttributes: {
         autocapitalize: 'off'
       },
+      inputValidator: text =>
+        (text.length > 18 && 'Max character is 18') ||
+        (text.length < 3 && 'Min Character is 3'),
       showCancelButton: true,
       confirmButtonText: 'Edit',
       showLoaderOnConfirm: true,

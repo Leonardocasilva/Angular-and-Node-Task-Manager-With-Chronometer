@@ -144,6 +144,8 @@ export class TasksFinishedComponent implements OnInit {
   }
 
   ValidationTasks(): void {
+    let teste = this.service.getCookie('TaskManagerList');
+
     this.Tasks = this.service
       .getCookie('TaskManagerList')
       .filter((el, i, arr) => {

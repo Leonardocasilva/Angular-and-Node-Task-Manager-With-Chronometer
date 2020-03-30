@@ -4,7 +4,7 @@
   </button>
   <div class="row">
     <div class="col-md-4 col-sm-12" *ngFor="let task of Tasks">
-      <div class="card border-dark" style="width: 18rem;">
+      <div class="card border-dark">
         <div class="card-header bg-dark text-white">
           <h5 class="card-title text-center">{{task.name}}</h5>
         </div>
@@ -12,18 +12,20 @@
           <p class="card-text text-center">{{task.hours}}:{{task.minutes}}:{{task.seconds}}</p>
         </div>
         <div class="card-footer text-center bg-dark">
-          <a (click)="StartTask(task.id)" placement="bottom" ngbTooltip="Start / Resume Task">
+          <button (click)="StartTask(task)" placement="bottom" ngbTooltip="Start / Resume Task"
+            [disabled]="(!task.stopped) && (!task.stopped && !task.isNew)">
             <fa-icon [icon]="['fas', 'play-circle']" size="2x" class="card-link text-success icons"></fa-icon>
-          </a>
-          <a (click)="StopTask(task.id)" placement="bottom" ngbTooltip="Stop Task">
+          </button>
+          <button (click)="StopTask(task)" placement="bottom" ngbTooltip="Stop Task"
+            [disabled]="task.stopped || task.isNew">
             <fa-icon [icon]="['fas', 'stop-circle']" size="2x" class="card-link text-danger icons"></fa-icon>
-          </a>
-          <a (click)="edit(task)" placement="bottom" ngbTooltip="Edit Task">
+          </button>
+          <button (click)="edit(task)" placement="bottom" ngbTooltip="Edit Task">
             <fa-icon [icon]="['fas', 'edit']" size="2x" class="card-link text-primary icons"></fa-icon>
-          </a>
-          <a (click)="finish(task)" placement="bottom" ngbTooltip="Finish Task">
+          </button>
+          <button (click)="finish(task)" placement="bottom" ngbTooltip="Finish Task" [disabled]="task.isNew">
             <fa-icon [icon]="['fas', 'check-circle']" size="2x" class="card-link text-success icons"></fa-icon>
-          </a>
+          </button>
         </div>
       </div>
     </div>

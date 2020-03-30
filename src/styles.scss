@@ -3,7 +3,7 @@
 html,
 body {
   font-family: 'Poppins', sans-serif;
-  background: #fafafa;
+  background: #adb5bd;
   height: 100% !important;
   margin: 0;
 }
@@ -49,7 +49,8 @@ a:focus {
 
 .card {
   margin-top: 2em;
-  width: 300px;
+  border-radius: 5px;
+  width: 18rem;
 
   .card-header {
     .card-title {
@@ -60,6 +61,20 @@ a:focus {
   .card-body {
     font-size: 50px;
     font-weight: bold;
+  }
+
+  .card-footer {
+    button {
+      background-color: unset;
+      border: none;
+
+      &:disabled {
+        svg {
+          cursor: not-allowed;
+          opacity: 40%;
+        }
+      }
+    }
   }
 }
 
