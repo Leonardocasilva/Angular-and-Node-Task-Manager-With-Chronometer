@@ -29,7 +29,7 @@ export class AppService {
   }
 
   startTask(task: TaskModel) {
-    return this.http.put(`${this.api}/tasks/start/${task._id}`, task);
+    return this.http.put<Array<TaskModel>>(`${this.api}/tasks/start/${task._id}`, task);
   }
 
   stopTask(task: TaskModel) {

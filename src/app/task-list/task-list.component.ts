@@ -1,13 +1,13 @@
-import { Component, OnInit } from "@angular/core";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { TaskModel } from "../../Model/TaskModel";
-import { AppService } from "../app.service";
-import Swal from "sweetalert2";
+import { Component, OnInit } from '@angular/core';
+import { TaskModel } from '../../Model/TaskModel';
+import { AppService } from '../app.service';
+import Swal from 'sweetalert2';
+import { mergeMap } from 'rxjs/operators';
 
 @Component({
-  selector: "app-task-list",
-  templateUrl: "./task-list.component.html",
-  styleUrls: ["./task-list.component.scss"]
+  selector: 'app-task-list',
+  templateUrl: './task-list.component.html',
+  styleUrls: ['./task-list.component.scss']
 })
 export class TaskListComponent implements OnInit {
   TaskStarted: Array<any> = [];
@@ -25,10 +25,10 @@ export class TaskListComponent implements OnInit {
 
     this.service.setTask(task).subscribe(
       result => {
-        Swal.fire(result["title"], result["message"], "success");
+        Swal.fire(result['title'], result['message'], 'success');
       },
       er => {
-        Swal.fire(er["title"], er["message"], "error");
+        Swal.fire(er['title'], er['message'], 'error');
       }
     );
 
@@ -43,7 +43,7 @@ export class TaskListComponent implements OnInit {
         this.ValidationTasks();
       },
       er => {
-        Swal.fire(er.title, er.message, "error");
+        Swal.fire(er.title, er.message, 'error');
       }
     );
   }
@@ -53,61 +53,63 @@ export class TaskListComponent implements OnInit {
 
     this.service.editTask(task).subscribe(
       result => {
-        Swal.fire(result["title"], result["message"], "success");
+        Swal.fire(result['title'], result['message'], 'success');
         this.ValidationTasks();
       },
       er => {
-        Swal.fire(er["title"], er["message"], "error");
+        Swal.fire(er['title'], er['message'], 'error');
       }
     );
   }
 
-  StartTask(task: TaskModel): void {
-    let seconds: number = 0;
-    let minutes: number = 0;
-    let hours: number = 0;
+  StartTask(task: TaskModel) {
+    let seconds = 0;
+    let minutes = 0;
+    let hours = 0;
 
-    this.service.startTask(task).subscribe(result => {
-      const TaskStr = setInterval(() => {
+    this.service.startTask(task)
+    .subscribe(result => {
+      this.TaskStarted[task._id] = setInterval(() => {
         this.Tasks = this.Tasks.filter((el, i, arr) => {
           if (el._id === task._id) {
+            el.stopped = false;
+            el.new = false;
+
             seconds = parseFloat(el.seconds) + 1;
             minutes = parseFloat(el.minutes) + 1;
             hours = parseFloat(el.hours) + 1;
 
             el.seconds =
               seconds.toString().length === 1
-                ? "0" + seconds.toString()
+                ? '0' + seconds.toString()
                 : seconds.toString();
 
-            if (el.seconds === "60") {
-              el.seconds = "00";
+            if (el.seconds === '60') {
+              el.seconds = '00';
               el.minutes =
                 minutes.toString().length === 1
-                  ? "0" + minutes.toString()
+                  ? '0' + minutes.toString()
                   : minutes.toString();
             }
 
-            if (el.minutes === "60") {
-              el.minutes = "00";
+            if (el.minutes === '60') {
+              el.minutes = '00';
               el.hours =
                 hours.toString().length === 1
-                  ? "0" + hours.toString()
+                  ? '0' + hours.toString()
                   : hours.toString();
             }
           }
 
           return arr;
         });
+
         this.service.updateTime(task).subscribe();
       }, 1000);
-
-      this.TaskStarted[task._id] = TaskStr;
-      this.ValidationTasks();
     });
   }
 
-  ValidationTasks(validateRunningTask: boolean = false): void {
+  ValidationTasks(validateRunningTask: boolean = false) {
     this.service.getTasks().subscribe(
       result => {
         this.Tasks = result.filter((el, i, arr) => {
@@ -123,23 +125,23 @@ export class TaskListComponent implements OnInit {
         }
       },
       er => {
-        Swal.fire(er.title, er.message, "error");
+        Swal.fire(er.title, er.message, 'error');
       }
     );
   }
 
   create(): void {
     Swal.fire({
-      title: "New Task",
-      input: "text",
+      title: 'New Task',
+      input: 'text',
       inputAttributes: {
-        autocapitalize: "off"
+        autocapitalize: 'off'
       },
       inputValidator: text =>
-        (text.length >= 18 && "Max character is 18") ||
-        (text.length < 3 && "Min Character is 3"),
+        (text.length >= 18 && 'Max character is 18') ||
+        (text.length < 3 && 'Min Character is 3'),
       showCancelButton: true,
-      confirmButtonText: "Save",
+      confirmButtonText: 'Save',
       showLoaderOnConfirm: true,
       preConfirm: taskName => {
         this.creatTask(taskName);
@@ -149,17 +151,17 @@ export class TaskListComponent implements OnInit {
 
   edit(task: TaskModel): void {
     Swal.fire({
-      title: "Edit Task",
-      input: "text",
+      title: 'Edit Task',
+      input: 'text',
       inputValue: task.name,
       inputAttributes: {
-        autocapitalize: "off"
+        autocapitalize: 'off'
       },
       inputValidator: text =>
-        (text.length > 18 && "Max character is 18") ||
-        (text.length < 3 && "Min Character is 3"),
+        (text.length > 18 && 'Max character is 18') ||
+        (text.length < 3 && 'Min Character is 3'),
       showCancelButton: true,
-      confirmButtonText: "Edit",
+      confirmButtonText: 'Edit',
       showLoaderOnConfirm: true,
       preConfirm: taskName => {
         this.EditTask(task, taskName);
@@ -178,11 +180,13 @@ export class TaskListComponent implements OnInit {
       confirmButtonText: 'Yes, do it!'
     }).then(result => {
       if (result.value) {
-        this.service.finsihTask(task).subscribe( result => {
+        this.service.finsihTask(task)
+        .subscribe( result => {
+          this.StopTask(task);
           Swal.fire(result['title'], result['message'], 'success');
           this.ValidationTasks();
         }, er => {
-          Swal.fire(er.title, er.message, "error");
+          Swal.fire(er.title, er.message, 'error');
         });
       }
     });

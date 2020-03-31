@@ -100,9 +100,13 @@ exports.start = (req, res, next) => {
     }
   })
     .then(result => {
-      res.status(200).send({
-        title: "Task Started",
-        message: "Your task has begin!"
+      Task.find({}).then( result => {
+        res.status(200).send(result);
+      }).catch(e => {
+        res.status(400).send({
+          message: "Look`s like something went wrong!",
+          error: e.message
+        });
       });
     })
     .catch(e => {
