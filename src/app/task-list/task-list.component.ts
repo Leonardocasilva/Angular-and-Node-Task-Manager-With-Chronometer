@@ -42,74 +42,96 @@ export class TaskListComponent implements OnInit {
   StopTask(task: TaskModel): void {
     clearInterval(this.TaskStarted[task.id]);
 
-    this.Tasks.filter((el, i, arr) => {
-      if (el.id === task.id) {
-        el.stopped = true;
-      }
+    try {
+    this.Tasks = this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
+          if (el.id === task.id) {
+            el.stopped = true;
+          }
 
-      this.Tasks = arr;
-    });
+          return arr;
+        });
 
     this.service.setCookie(this.Tasks, 'TaskManagerList');
+    this.ValidationTasks();
+    } catch (ex) {
+      Swal.fire('Ops', 'Something went wrong!', 'error');
+    }
   }
 
   EditTask(task: TaskModel, newName: string): void {
-    this.Tasks.filter((el, i, arr) => {
-      if (el.id === task.id) {
-        el.name = newName;
-      }
-
-      this.Tasks = arr;
-    });
-
-    this.service.setCookie(this.Tasks, 'TaskManagerList');
-  }
-
-  StartTask(task: TaskModel): void {
-    const taskIn = this.Tasks.filter((el, i, arr) => {
-      if (el.id === task.id) {
-        el.isNew = false;
-        el.stopped = false;
-        return el;
-      }
-    });
-
-    const TaskStr = setInterval(() => {
-      const seconds = parseFloat(taskIn[0].seconds) + 1;
-      const minutes = parseFloat(taskIn[0].minutes) + 1;
-      const hours = parseFloat(taskIn[0].hours) + 1;
-
-      taskIn[0].seconds =
-        seconds.toString().length === 1
-          ? '0' + seconds.toString()
-          : seconds.toString();
-
-      if (taskIn[0].seconds === '60') {
-        taskIn[0].seconds = '00';
-        taskIn[0].minutes =
-          minutes.toString().length === 1
-            ? '0' + minutes.toString()
-            : minutes.toString();
-      }
-
-      if (taskIn[0].minutes === '60') {
-        taskIn[0].minutes = '00';
-        taskIn[0].hours =
-          hours.toString().length === 1
-            ? '0' + hours.toString()
-            : hours.toString();
-      }
-
-      this.Tasks.filter((el, i, arr) => {
+    try {
+      this.Tasks = this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
         if (el.id === task.id) {
-          this.Tasks = arr;
+          el.name = newName;
         }
+
+        return arr;
       });
 
       this.service.setCookie(this.Tasks, 'TaskManagerList');
-    }, 1000);
+      this.ValidationTasks();
+    } catch (ex) {
+      Swal.fire('Ops', 'Something went wrong!', 'error');
+    }
+  }
 
-    this.TaskStarted[task.id] = TaskStr;
+  StartTask(task: TaskModel): void {
+    try {
+      this.Tasks = this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
+        if (el.id === task.id) {
+          el.isNew = false;
+          el.stopped = false;
+        }
+
+        return arr;
+      });
+
+      this.service.setCookie(this.Tasks, 'TaskManagerList');
+      this.ValidationTasks();
+
+      let seconds: number = 0;
+      let minutes: number = 0;
+      let hours: number = 0;
+
+      const TaskStr = setInterval(() => {
+        this.Tasks = this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
+          if (el.id === task.id) {
+            seconds = parseFloat(el.seconds) + 1;
+            minutes = parseFloat(el.minutes) + 1;
+            hours = parseFloat(el.hours) + 1;
+
+            el.seconds = seconds.toString().length === 1
+            ? '0' + seconds.toString()
+            : seconds.toString();
+
+            if (el.seconds === '60') {
+              el.seconds = '00';
+              el.minutes =
+                minutes.toString().length === 1
+                  ? '0' + minutes.toString()
+                  : minutes.toString();
+            }
+
+            if (el.minutes === '60') {
+              el.minutes = '00';
+              el.hours =
+                hours.toString().length === 1
+                  ? '0' + hours.toString()
+                  : hours.toString();
+            }
+          }
+
+          return arr;
+        });
+
+        this.service.setCookie(this.Tasks, 'TaskManagerList');
+      }, 1000);
+
+      this.TaskStarted[task.id] = TaskStr;
+    } catch (ex) {
+      Swal.fire('Ops', 'Something went wrong!', 'error');
+    }
+
   }
 
   ValidationTasks(): void {
@@ -126,7 +148,6 @@ export class TaskListComponent implements OnInit {
         }
       });
     } catch (ex) {
-      Swal.fire('Hello', 'Look`s like that we don`t have any task yet! let`s create one?', 'info');
     }
   }
 
@@ -193,13 +214,15 @@ export class TaskListComponent implements OnInit {
     }).then(result => {
       if (result.value) {
         try {
-          this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
+          this.Tasks = this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
             if (el.id === task.id) {
               el.done = true;
-              el.stopped = true;
+              if (el.stopped === false) {
+                el.stopped = true;
+              }
             }
 
-            this.Tasks = arr;
+            return arr;
           });
 
           this.service.setCookie(this.Tasks, 'TaskManagerList');
