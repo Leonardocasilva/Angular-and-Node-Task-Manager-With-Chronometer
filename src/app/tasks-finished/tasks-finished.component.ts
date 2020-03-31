@@ -44,8 +44,9 @@ export class TasksFinishedComponent implements OnInit {
         this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
           if (el.id === task.id) {
             el.done = false;
-            this.Tasks = arr;
           }
+
+          this.Tasks = arr;
         });
 
         this.service.setCookie(this.Tasks, 'TaskManagerList');
@@ -144,12 +145,14 @@ export class TasksFinishedComponent implements OnInit {
   }
 
   ValidationTasks(): void {
-    let teste = this.service.getCookie('TaskManagerList');
-
-    this.Tasks = this.service
+    try {
+      this.Tasks = this.service
       .getCookie('TaskManagerList')
       .filter((el, i, arr) => {
         return el.done === true;
       });
+    } catch (ex) {
+      console.log(ex.error);
+    }
   }
 }

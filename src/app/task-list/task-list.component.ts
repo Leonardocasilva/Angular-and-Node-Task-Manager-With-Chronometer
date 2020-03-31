@@ -22,16 +22,21 @@ export class TaskListComponent implements OnInit {
 
   creatTask(taskName): void {
     this.Task = new TaskModel();
-
     this.Task.name = taskName;
+    let localTasks: Array<TaskModel> = [];
 
-    if (this.Tasks.length !== 0) {
-      this.Task.id = this.Tasks.length + 1;
+    try {
+      localTasks = this.service.getCookie('TaskManagerList');
+
+      this.Task.id = localTasks.length;
+
+      localTasks.push(this.Task);
+    } catch (ex) {
+      localTasks.push(this.Task);
     }
 
-    this.Tasks.push(this.Task);
-
-    this.service.setCookie(this.Tasks, 'TaskManagerList');
+    this.service.setCookie(localTasks, 'TaskManagerList');
+    this.ValidationTasks();
   }
 
   StopTask(task: TaskModel): void {
@@ -40,8 +45,9 @@ export class TaskListComponent implements OnInit {
     this.Tasks.filter((el, i, arr) => {
       if (el.id === task.id) {
         el.stopped = true;
-        this.Tasks = arr;
       }
+
+      this.Tasks = arr;
     });
 
     this.service.setCookie(this.Tasks, 'TaskManagerList');
@@ -51,8 +57,9 @@ export class TaskListComponent implements OnInit {
     this.Tasks.filter((el, i, arr) => {
       if (el.id === task.id) {
         el.name = newName;
-        this.Tasks = arr;
       }
+
+      this.Tasks = arr;
     });
 
     this.service.setCookie(this.Tasks, 'TaskManagerList');
@@ -107,9 +114,6 @@ export class TaskListComponent implements OnInit {
 
   ValidationTasks(): void {
     try {
-      debugger;
-      let test = this.service.getCookie('TaskManagerList');
-
       this.Tasks = this.service
         .getCookie('TaskManagerList')
         .filter((el, i, arr) => {
@@ -121,7 +125,9 @@ export class TaskListComponent implements OnInit {
           this.StartTask(t);
         }
       });
-    } catch (ex) {}
+    } catch (ex) {
+      Swal.fire('Hello', 'Look`s like that we don`t have any task yet! let`s create one?', 'info');
+    }
   }
 
   create(): void {
@@ -186,21 +192,28 @@ export class TaskListComponent implements OnInit {
       confirmButtonText: 'Yes, do it!'
     }).then(result => {
       if (result.value) {
-        this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
-          if (el.id === task.id) {
-            el.done = true;
+        try {
+          this.service.getCookie('TaskManagerList').filter((el, i, arr) => {
+            if (el.id === task.id) {
+              el.done = true;
+              el.stopped = true;
+            }
+
             this.Tasks = arr;
-          }
-        });
+          });
 
-        this.service.setCookie(this.Tasks, 'TaskManagerList');
-        this.ValidationTasks();
+          this.service.setCookie(this.Tasks, 'TaskManagerList');
+          this.ValidationTasks();
 
-        Swal.fire(
-          'Task Finished',
-          'Your task was finished with success!',
-          'success'
-        );
+          Swal.fire(
+            'Task Finished',
+            'Your task was finished with success!',
+            'success'
+          );
+        }catch (ex) {
+          Swal.fire('Ops', 'We find a error, let`s try again?');
+          this.ValidationTasks();
+        }
       }
     });
   }

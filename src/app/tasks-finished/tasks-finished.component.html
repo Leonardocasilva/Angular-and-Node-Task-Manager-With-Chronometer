@@ -1,5 +1,10 @@
 <div class="container">
   <div class="row">
+    <div class="total-time col-md-12 col-sm-12 text-center bg-dark">
+      <span class="text-light">Total Time Expanded: <small class="text-info">{{taskTotalTime}}</small></span>
+    </div>
+  </div>
+  <div class="row">
     <div class="col-md-4 col-sm-12" *ngFor="let task of Tasks">
       <div class="card border-dark text-white">
         <div class="card-header bg-dark">
