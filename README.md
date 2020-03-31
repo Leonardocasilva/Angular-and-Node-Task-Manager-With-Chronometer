@@ -19,6 +19,10 @@
 - Database
   - MongoDB
 
+I used a cluster of MongoDB that is hosted on web, in some cases, the server block the local IP, so, if this happens, I think that is a good idea, create a personal cluster and change de Mongo connection, on the App file, inside the Server directory, to avoid head pain.
+
+Here is the [cluste used](https://cloud.mongodb.com/)
+
 # Executing the App
 
 ## Installing the dependencies
