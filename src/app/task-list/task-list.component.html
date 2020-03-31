@@ -13,17 +13,17 @@
         </div>
         <div class="card-footer text-center bg-dark">
           <button (click)="StartTask(task)" placement="bottom" ngbTooltip="Start / Resume Task"
-            [disabled]="(!task.stopped) && (!task.stopped && !task.isNew)">
+            [disabled]="(!task.stopped) && (!task.stopped && !task.new)">
             <fa-icon [icon]="['fas', 'play-circle']" size="2x" class="card-link text-success icons"></fa-icon>
           </button>
           <button (click)="StopTask(task)" placement="bottom" ngbTooltip="Stop Task"
-            [disabled]="task.stopped || task.isNew">
+            [disabled]="task.stopped || task.new">
             <fa-icon [icon]="['fas', 'stop-circle']" size="2x" class="card-link text-danger icons"></fa-icon>
           </button>
           <button (click)="edit(task)" placement="bottom" ngbTooltip="Edit Task">
             <fa-icon [icon]="['fas', 'edit']" size="2x" class="card-link text-primary icons"></fa-icon>
           </button>
-          <button (click)="finish(task)" placement="bottom" ngbTooltip="Finish Task" [disabled]="task.isNew">
+          <button (click)="finish(task)" placement="bottom" ngbTooltip="Finish Task" [disabled]="task.new">
             <fa-icon [icon]="['fas', 'check-circle']" size="2x" class="card-link text-success icons"></fa-icon>
           </button>
         </div>

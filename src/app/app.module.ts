@@ -17,6 +17,7 @@ import {
   FaIconLibrary
 } from '@fortawesome/angular-fontawesome';
 import { fas } from '@fortawesome/free-solid-svg-icons';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [AppComponent, TasksFinishedComponent, TaskListComponent],
@@ -26,7 +27,8 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
     ReactiveFormsModule,
     SweetAlert2Module.forRoot(),
     NgbModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    HttpClientModule
   ],
   providers: [CookieService, AppService],
   bootstrap: [AppComponent]

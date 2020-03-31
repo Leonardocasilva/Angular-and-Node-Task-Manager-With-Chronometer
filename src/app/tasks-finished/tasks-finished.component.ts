@@ -29,27 +29,39 @@ export class TasksFinishedComponent implements OnInit {
       confirmButtonText: "Yes, do it!"
     }).then(result => {
       if (result.value) {
-        this.service.getCookie("TaskManagerList").filter((el, i, arr) => {
-          if (el.id === task.id) {
-            el.done = false;
-          }
-
-          this.Tasks = arr;
+        this.service.reopenTask(task).subscribe( result => {
+          Swal.fire(result['title'], result['message'], 'success');
+          this.ValidationTasks();
+        }, er => {
+          Swal.fire(er['title'], er['message'], 'error');
         });
-
-        this.service.setCookie(this.Tasks, "TaskManagerList");
-        this.ValidationTasks();
-
-        Swal.fire(
-          "Task Finished",
-          "Your task was finished with success!",
-          "success"
-        );
       }
     });
   }
 
-  calculateTotal(): void {
+  ValidationTasks(): void {
+    this.service.getTasks().subscribe(
+      result => {
+        this.Tasks = result.filter((el, i, arr) => {
+          return el.done === true;
+        });
+
+        this.calculateTotal();
+      },
+      er => {
+        Swal.fire(er.title, er.message, "error");
+      }
+    );
+  }
+
+  private remainDecimals(num: number): object {
+    return {
+      integer: parseFloat((num / 60).toString().split('.')[0]),
+      decimal: parseFloat((num % 60).toString())
+    };
+  }
+
+  private calculateTotal(): void {
     let seconds = 0;
     let minutes = 0;
     let hours = 0;
@@ -139,28 +151,5 @@ export class TasksFinishedComponent implements OnInit {
     }
 
     this.taskTotalTime = ret;
-  }
-
-  remainDecimals(num: number): object {
-    // const ret = num.toString().split('.');
-
-    return {
-      integer: parseFloat((num / 60).toString().split('.')[0]),
-      decimal: parseFloat((num % 60).toString())
-    };
-  }
-
-  ValidationTasks(): void {
-    try {
-      this.Tasks = this.service
-        .getCookie('TaskManagerList')
-        .filter((el, i, arr) => {
-          return el.done === true;
-        });
-
-      this.calculateTotal();
-    } catch (ex) {
-      console.log(ex.error);
-    }
   }
 }
