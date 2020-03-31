@@ -1,62 +1,33 @@
-<div class="row">
-  <div class="col-md-12 col-sm-12">
-    <table class="table table-stripped">
-      <thead>
-        <tr rowspan="3">
-          <button class="btn btn-lg btn-outline-primary" (click)="open(content)">New Task</button>
-        </tr>
-        <tr>
-          <th>Name</th>
-          <th>Time Elapsed</th>
-          <th class="text-center">Options</th>
-        </tr>
-      </thead>
-      <tbody >
-        <tr *ngFor="let task of Tasks">
-          <td>{{task.name}}</td>
-          <td>{{task.hours}}:{{task.minutes}}:{{task.seconds}}</td>
-          <td class="text-center">
-            <button class="btn btn-success" (click)="StartTask(task.id)">
-              Start
-            </button>
-            <button class="btn btn-danger" (click)="StopTask(task.id)">
-              Stop
-            </button>
-            <button class="btn btn-primary" (click)="EditTask(task, content)">
-              Editar
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- MODAL -->
-
-<ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">{{ModalTaskName}}</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <form [formGroup]="Form">
-      <div class="form-group">
-        <label for="dateOfBirth">Task Name</label>
-        <div class="input-group">
-          <input id="TaskName" class="form-control" placeholder="Task Name" name="TaskName" formControlName="name">
+<div class="container">
+  <button class="btn btn-info new-task-btn" (click)="create()" placement="left" ngbTooltip="Create Task">
+    <fa-icon [icon]="['fas', 'plus']" size="3x"></fa-icon>
+  </button>
+  <div class="row">
+    <div class="col-md-4 col-sm-12" *ngFor="let task of Tasks">
+      <div class="card border-dark">
+        <div class="card-header bg-dark text-white">
+          <h5 class="card-title text-center">{{task.name}}</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text text-center">{{task.hours}}:{{task.minutes}}:{{task.seconds}}</p>
+        </div>
+        <div class="card-footer text-center bg-dark">
+          <button (click)="StartTask(task)" placement="bottom" ngbTooltip="Start / Resume Task"
+            [disabled]="(!task.stopped) && (!task.stopped && !task.new)">
+            <fa-icon [icon]="['fas', 'play-circle']" size="2x" class="card-link text-success icons"></fa-icon>
+          </button>
+          <button (click)="StopTask(task)" placement="bottom" ngbTooltip="Stop Task"
+            [disabled]="task.stopped || task.new">
+            <fa-icon [icon]="['fas', 'stop-circle']" size="2x" class="card-link text-danger icons"></fa-icon>
+          </button>
+          <button (click)="edit(task)" placement="bottom" ngbTooltip="Edit Task">
+            <fa-icon [icon]="['fas', 'edit']" size="2x" class="card-link text-primary icons"></fa-icon>
+          </button>
+          <button (click)="finish(task)" placement="bottom" ngbTooltip="Finish Task" [disabled]="task.new">
+            <fa-icon [icon]="['fas', 'check-circle']" size="2x" class="card-link text-success icons"></fa-icon>
+          </button>
         </div>
       </div>
-    </form>
+    </div>
   </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark" (click)="creatTask(Form.value)" *ngIf="!ModalEdit" >Save</button>
-    <button type="button" class="btn btn-outline-dark" (click)="SubmitEditTask(Form.value, content)" *ngIf="ModalEdit">Edit</button>
-  </div>
-</ng-template>
-
-<hr>
-
-<pre>{{ CloseResult }}</pre>
+</div>

@@ -3,20 +3,19 @@
     <!-- Sidebar -->
     <nav id="sidebar" class="active">
       <div id="dismiss" (click)="Dimiss()">
-        <i class="fas fa-arrow-left"></i>
+        <fa-icon [icon]="['fas', 'arrow-left']" size="lg" class="dismissMenu"></fa-icon>
       </div>
 
       <div class="sidebar-header">
-        <h3>Bootstrap Sidebar</h3>
+        <h3>Task Manager</h3>
       </div>
 
       <ul class="list-unstyled components">
-        <p>Dummy Heading</p>
         <li>
-          <a routerLink="/" (click)="collapaseSideNav()">Task List</a>
+          <a (click)="navigate('/')">Task List</a>
         </li>
         <li>
-          <a routerLink="/finished" (click)="collapaseSideNav()">Task Finished</a>
+          <a (click)="navigate('/finished')">Task Finished</a>
         </li>
       </ul>
     </nav>
@@ -26,15 +25,9 @@
 
     <!-- Page Content -->
     <nav class="navbar navbar-expand-lg navbar-light bg-dark">
-      <button
-        type="button"
-        id="sidebarCollapse"
-        class="btn btn-outline-info"
-        (click)="collapaseSideNav()"
-      >
-        <i class="fas fas-close"></i>
+      <button type="button" id="sidebarCollapse" class="btn btn-outline-info" (click)="collapaseSideNav()">
+        <fa-icon [icon]="['fas', 'align-justify']"></fa-icon>
       </button>
-      <button class="btn btn-outline-info float-right" >New Task</button>
     </nav>
 
     <router-outlet></router-outlet>

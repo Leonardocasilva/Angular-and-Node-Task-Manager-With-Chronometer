@@ -1,10 +1,10 @@
 export class TaskModel {
-    id = 0;
+    _id = null;
     name = null;
     hours = '00';
     minutes = '00';
     seconds = '00';
-    isNew = true;
-    done = false;
+    new = true;
     stopped = false;
+    done = false;
 }

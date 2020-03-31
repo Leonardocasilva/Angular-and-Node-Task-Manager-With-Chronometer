@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { TaskModel } from '../../Model/TaskModel';
 import { AppService } from '../app.service';
+import Swal from 'sweetalert2';
+import { mergeMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-task-list',
@@ -10,159 +10,185 @@ import { AppService } from '../app.service';
   styleUrls: ['./task-list.component.scss']
 })
 export class TaskListComponent implements OnInit {
-  CloseResult = '';
-  ModalTaskName = 'New Task';
-  ModalEdit = false;
   TaskStarted: Array<any> = [];
   Tasks: Array<TaskModel> = [];
-  EditableTaskId = null;
-  Task: TaskModel;
-  Form: FormGroup;
 
-  constructor(private service: AppService, private modalService: NgbModal) { }
+  constructor(private service: AppService) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.ValidationTasks(true);
+  }
 
-    this.Form = new FormGroup({
-      name: new FormControl(null, [Validators.required])
-    });
+  creatTask(taskName): void {
+    const task = new TaskModel();
+    task.name = taskName;
 
-    // this.service.setCookie(teste);
+    this.service.setTask(task).subscribe(
+      result => {
+        Swal.fire(result['title'], result['message'], 'success');
+      },
+      er => {
+        Swal.fire(er['title'], er['message'], 'error');
+      }
+    );
 
     this.ValidationTasks();
   }
 
-  creatTask(task: TaskModel) {
-    this.Task = new TaskModel();
+  StopTask(task: TaskModel): void {
+    clearInterval(this.TaskStarted[task._id]);
 
-    this.Task.name = task.name;
-
-    if (this.Tasks.length !== 0) {
-      this.Task.id = this.Tasks.length + 1;
-    }
-
-    this.Tasks.push(this.Task);
-
-    this.service.setCookie(this.Tasks);
-  }
-
-  StopTask(id) {
-    clearInterval(this.TaskStarted[id]);
-
-    this.Tasks.filter((el, i, arr) => {
-      if (el.id === id) {
-        el.stopped = true;
-        this.Tasks = arr;
+    this.service.stopTask(task).subscribe(
+      result => {
+        this.ValidationTasks();
+      },
+      er => {
+        Swal.fire(er.title, er.message, 'error');
       }
-    });
-
-    this.service.setCookie(this.Tasks);
+    );
   }
 
-  EditTask(task: TaskModel, content) {
-    this.open(content);
+  EditTask(task: TaskModel, newName: string): void {
+    task.name = newName;
 
-    this.Form.patchValue({
-      name: task.name
-    });
-
-    this.EditableTaskId = task.id;
-
-    this.ModalTaskName = 'Edit';
-
-    this.ModalEdit = true;
-  }
-
-  SubmitEditTask(task, content) {
-    this.Tasks.filter((el, i, arr) => {
-      if (el.id === this.EditableTaskId) {
-        el.name = task.name;
-        this.Tasks = arr;
+    this.service.editTask(task).subscribe(
+      result => {
+        Swal.fire(result['title'], result['message'], 'success');
+        this.ValidationTasks();
+      },
+      er => {
+        Swal.fire(er['title'], er['message'], 'error');
       }
-    });
-
-    this.service.setCookie(this.Tasks);
-
-    this.modalService.dismissAll(content);
-
-    this.EditableTaskId = null;
+    );
   }
 
-  StartTask(id) {
-    const task = this.Tasks.filter((el, i, arr) => {
-      if (el.id === id) {
-        el.isNew = false;
-        el.stopped = false;
-        return el;
-      }
-    });
+  StartTask(task: TaskModel) {
+    let seconds = 0;
+    let minutes = 0;
+    let hours = 0;
 
-    const TaskStr = setInterval(() => {
-        const seconds = parseFloat(task[0].seconds) + 1;
-        const minutes = parseFloat(task[0].minutes) + 1;
-        const hours = parseFloat(task[0].hours) + 1;
+    this.service.startTask(task)
+    .subscribe(result => {
+      this.TaskStarted[task._id] = setInterval(() => {
+        this.Tasks = this.Tasks.filter((el, i, arr) => {
+          if (el._id === task._id) {
+            el.stopped = false;
+            el.new = false;
 
-        task[0].seconds = seconds.toString().length === 1 ?
-          '0' + seconds.toString() : seconds.toString();
+            seconds = parseFloat(el.seconds) + 1;
+            minutes = parseFloat(el.minutes) + 1;
+            hours = parseFloat(el.hours) + 1;
 
-        if (task[0].seconds === '60') {
-          task[0].seconds = '00';
-          task[0].minutes = minutes.toString().length === 1 ?
-            '0' + minutes.toString() : minutes.toString();
-        }
+            el.seconds =
+              seconds.toString().length === 1
+                ? '0' + seconds.toString()
+                : seconds.toString();
 
-        if (task[0].minutes === '60') {
-          task[0].minutes = '00';
-          task[0].hours = hours.toString().length === 1 ?
-            '0' + hours.toString() : hours.toString();
-        }
+            if (el.seconds === '60') {
+              el.seconds = '00';
+              el.minutes =
+                minutes.toString().length === 1
+                  ? '0' + minutes.toString()
+                  : minutes.toString();
+            }
 
-        this.Tasks.filter((el, i, arr) => {
-          if (el.id === id) {
-            this.Tasks = arr;
+            if (el.minutes === '60') {
+              el.minutes = '00';
+              el.hours =
+                hours.toString().length === 1
+                  ? '0' + hours.toString()
+                  : hours.toString();
+            }
           }
+
+          return arr;
         });
 
-        this.service.setCookie(this.Tasks);
-    }, 1000);
-
-    this.TaskStarted[id] = TaskStr;
-  }
-
-  ValidationTasks() {
-    const notDone: Array<any> = [];
-
-    try {
-      this.Tasks = this.service.getCookie();
-
-      this.Tasks.filter((el, i, arr) => {
-        if (!el.done) {
-          notDone.push(el);
-        }
-      });
-
-      this.Tasks = notDone;
-
-      this.Tasks.forEach(t => {
-        if (t.stopped === false && t.isNew === false) {
-          this.StartTask(t.id);
-        }
-      });
-
-    } catch (ex) { }
-  }
-
-  open(content) {
-    this.ModalTaskName = 'New Task';
-
-    this.ModalEdit = false;
-
-    this.Form.patchValue({
-      name: null
+        this.service.updateTime(task).subscribe();
+      }, 1000);
     });
+  }
 
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then(result => {
-      this.modalService.dismissAll(content);
+  ValidationTasks(validateRunningTask: boolean = false) {
+    this.service.getTasks().subscribe(
+      result => {
+        this.Tasks = result.filter((el, i, arr) => {
+          return el.done === false;
+        });
+
+        if (validateRunningTask) {
+          this.Tasks.forEach(t => {
+            if (t.stopped === false && t.new === false) {
+              this.StartTask(t);
+            }
+          });
+        }
+      },
+      er => {
+        Swal.fire(er.title, er.message, 'error');
+      }
+    );
+  }
+
+  create(): void {
+    Swal.fire({
+      title: 'New Task',
+      input: 'text',
+      inputAttributes: {
+        autocapitalize: 'off'
+      },
+      inputValidator: text =>
+        (text.length >= 18 && 'Max character is 18') ||
+        (text.length < 3 && 'Min Character is 3'),
+      showCancelButton: true,
+      confirmButtonText: 'Save',
+      showLoaderOnConfirm: true,
+      preConfirm: taskName => {
+        this.creatTask(taskName);
+      }
+    });
+  }
+
+  edit(task: TaskModel): void {
+    Swal.fire({
+      title: 'Edit Task',
+      input: 'text',
+      inputValue: task.name,
+      inputAttributes: {
+        autocapitalize: 'off'
+      },
+      inputValidator: text =>
+        (text.length > 18 && 'Max character is 18') ||
+        (text.length < 3 && 'Min Character is 3'),
+      showCancelButton: true,
+      confirmButtonText: 'Edit',
+      showLoaderOnConfirm: true,
+      preConfirm: taskName => {
+        this.EditTask(task, taskName);
+      }
+    });
+  }
+
+  finish(task: TaskModel): void {
+    Swal.fire({
+      title: 'Finish Task',
+      text: 'Are you sure that you want finish this task?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, do it!'
+    }).then(result => {
+      if (result.value) {
+        this.service.finsihTask(task)
+        .subscribe( result => {
+          this.StopTask(task);
+          Swal.fire(result['title'], result['message'], 'success');
+          this.ValidationTasks();
+        }, er => {
+          Swal.fire(er.title, er.message, 'error');
+        });
+      }
     });
   }
 }
