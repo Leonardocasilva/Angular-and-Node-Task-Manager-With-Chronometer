@@ -15,7 +15,8 @@
     "debug": "^4.1.1",
     "express": "^4.17.1",
     "http": "0.0.1-security",
-    "mongoose": "^5.9.7"
+    "mongoose": "^5.9.7",
+    "request": "^2.88.2"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
