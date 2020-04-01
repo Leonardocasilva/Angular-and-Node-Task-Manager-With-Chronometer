@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { TaskModel } from '../../Model/TaskModel';
 import { AppService } from '../app.service';
 import Swal from 'sweetalert2';
-import { mergeMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-task-list',
@@ -13,10 +12,11 @@ export class TaskListComponent implements OnInit {
   TaskStarted: Array<any> = [];
   Tasks: Array<TaskModel> = [];
 
+
   constructor(private service: AppService) {}
 
   ngOnInit() {
-    this.ValidationTasks(true);
+    this.ValidationTasks();
   }
 
   creatTask(taskName): void {
@@ -40,7 +40,7 @@ export class TaskListComponent implements OnInit {
 
     this.service.stopTask(task).subscribe(
       result => {
-        this.ValidationTasks();
+        // Note Implemented
       },
       er => {
         Swal.fire(er.title, er.message, 'error');
@@ -54,7 +54,6 @@ export class TaskListComponent implements OnInit {
     this.service.editTask(task).subscribe(
       result => {
         Swal.fire(result['title'], result['message'], 'success');
-        this.ValidationTasks();
       },
       er => {
         Swal.fire(er['title'], er['message'], 'error');
@@ -63,71 +62,27 @@ export class TaskListComponent implements OnInit {
   }
 
   StartTask(task: TaskModel) {
-    let seconds = 0;
-    let minutes = 0;
-    let hours = 0;
-
     this.service.startTask(task)
     .subscribe(result => {
-      this.TaskStarted[task._id] = setInterval(() => {
-        this.Tasks = this.Tasks.filter((el, i, arr) => {
-          if (el._id === task._id) {
-            el.stopped = false;
-            el.new = false;
-
-            seconds = parseFloat(el.seconds) + 1;
-            minutes = parseFloat(el.minutes) + 1;
-            hours = parseFloat(el.hours) + 1;
-
-            el.seconds =
-              seconds.toString().length === 1
-                ? '0' + seconds.toString()
-                : seconds.toString();
-
-            if (el.seconds === '60') {
-              el.seconds = '00';
-              el.minutes =
-                minutes.toString().length === 1
-                  ? '0' + minutes.toString()
-                  : minutes.toString();
-            }
-
-            if (el.minutes === '60') {
-              el.minutes = '00';
-              el.hours =
-                hours.toString().length === 1
-                  ? '0' + hours.toString()
-                  : hours.toString();
-            }
-          }
-
-          return arr;
-        });
-
-        this.service.updateTime(task).subscribe();
-      }, 1000);
+      // Not Implemented
+    }, er => {
+      Swal.fire(er.title, er.message, 'error');
     });
   }
 
-  ValidationTasks(validateRunningTask: boolean = false) {
-    this.service.getTasks().subscribe(
-      result => {
-        this.Tasks = result.filter((el, i, arr) => {
-          return el.done === false;
-        });
-
-        if (validateRunningTask) {
-          this.Tasks.forEach(t => {
-            if (t.stopped === false && t.new === false) {
-              this.StartTask(t);
-            }
+  ValidationTasks() {
+    setInterval(() => {
+      this.service.getTasks().subscribe(
+        result => {
+          this.Tasks = result.filter((el, i, arr) => {
+            return el.done === false;
           });
+        },
+        er => {
+          Swal.fire(er.title, er.message, 'error');
         }
-      },
-      er => {
-        Swal.fire(er.title, er.message, 'error');
-      }
-    );
+      );
+    }, 1000);
   }
 
   create(): void {
@@ -182,9 +137,7 @@ export class TaskListComponent implements OnInit {
       if (result.value) {
         this.service.finsihTask(task)
         .subscribe( result => {
-          this.StopTask(task);
           Swal.fire(result['title'], result['message'], 'success');
-          this.ValidationTasks();
         }, er => {
           Swal.fire(er.title, er.message, 'error');
         });

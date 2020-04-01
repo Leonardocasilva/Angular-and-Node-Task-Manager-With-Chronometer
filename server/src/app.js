@@ -28,4 +28,14 @@ app.use(cors());
 app.use('/', indexRoute);
 app.use('/tasks', tasksRoute);
 
+const Emitter = require('./config/listen');
+const emmiter = Emitter.emitter;
+
+
+setInterval(() => {
+  emmiter.emit('init', () => {
+    return;
+  })
+}, 1000);
+
 module.exports = app;
