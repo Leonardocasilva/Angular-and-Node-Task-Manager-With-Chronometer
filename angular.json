@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "TaskManagerWithChronometer"
+    }
+  },
+  "defaultProject": "TaskManagerWithChronometer",
+  "cli": {
+    "analytics": "feb6c607-e0fc-46bc-aca4-c76472fae9b8"
+  }
 }

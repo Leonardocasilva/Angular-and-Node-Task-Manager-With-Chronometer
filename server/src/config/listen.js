@@ -61,17 +61,11 @@ emitter.on("init", args => {
             "name": ret[i].name
           },
         });
-
-        // console.log(
-        //   `${ret[i]._id} ==> Hours: ${ret[i].hours}, Minutes: ${ret[i].minutes}, Seconds: ${ret[i].seconds}`
-        // );
-        // console.log(
-        //   `${ret[i]._id} ==> Hours: ${hours}, Minutes: ${minutes}, Seconds: ${seconds}`
-        // );
       }
     }
   });
 
 
 });
+
 exports.emitter = emitter;

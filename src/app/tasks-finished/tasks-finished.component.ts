@@ -12,7 +12,7 @@ export class TasksFinishedComponent implements OnInit {
   Tasks: Array<TaskModel> = [];
   taskTotalTime: string;
 
-  constructor(private service: AppService) { }
+  constructor(private service: AppService) {}
 
   ngOnInit(): void {
     this.ValidationTasks();
@@ -20,38 +20,38 @@ export class TasksFinishedComponent implements OnInit {
 
   reopen(task: TaskModel): void {
     Swal.fire({
-      title: "Reopen Task",
-      text: "Are you sure that you want reopen this task?",
-      icon: "question",
+      title: 'Reopen Task',
+      text: 'Are you sure that you want reopen this task?',
+      icon: 'question',
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, do it!"
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, do it!'
     }).then(result => {
       if (result.value) {
-        this.service.reopenTask(task).subscribe( result => {
-          Swal.fire(result['title'], result['message'], 'success');
-          this.ValidationTasks();
-        }, er => {
-          Swal.fire(er['title'], er['message'], 'error');
-        });
+        this.service.reopenTask(task).subscribe(
+          result => {
+            Swal.fire(result['title'], result['message'], 'success');
+            this.ValidationTasks();
+          },
+          er => {
+            Swal.fire(er['title'], er['message'], 'error');
+          }
+        );
       }
     });
   }
 
-  ValidationTasks(): void {
-    this.service.getTasks().subscribe(
-      result => {
-        this.Tasks = result.filter((el, i, arr) => {
-          return el.done === true;
-        });
+  async ValidationTasks() {
+    const data = await this.service.getTasks();
 
-        this.calculateTotal();
-      },
-      er => {
-        Swal.fire(er.title, er.message, "error");
-      }
-    );
+    data.subscribe(result => {
+      this.Tasks = result.filter((el, i, arr) => {
+        return el.done === true;
+      });
+
+      this.calculateTotal();
+    });
   }
 
   private remainDecimals(num: number): object {
