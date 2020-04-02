@@ -1,4 +1,6 @@
-const { performance } = require("perf_hooks");
+const {
+  performance
+} = require("perf_hooks");
 const EventEmitter = require("events").EventEmitter;
 const request = require("request");
 
@@ -27,24 +29,24 @@ emitter.on("init", args => {
         hours = parseFloat(ret[i].hours) + 1;
 
         ret[i].seconds =
-          seconds.toString().length === 1
-            ? "0" + seconds.toString()
-            : seconds.toString();
+          seconds.toString().length === 1 ?
+          "0" + seconds.toString() :
+          seconds.toString();
 
         if (ret[i].seconds === "60") {
           ret[i].seconds = "00";
           ret[i].minutes =
-            minutes.toString().length === 1
-              ? "0" + minutes.toString()
-              : minutes.toString();
+            minutes.toString().length === 1 ?
+            "0" + minutes.toString() :
+            minutes.toString();
         }
 
         if (ret[i].minutes === "60") {
           ret[i].minutes = "00";
           ret[i].hours =
-            hours.toString().length === 1
-              ? "0" + hours.toString()
-              : hours.toString();
+            hours.toString().length === 1 ?
+            "0" + hours.toString() :
+            hours.toString();
         }
 
         request({
@@ -61,17 +63,11 @@ emitter.on("init", args => {
             "name": ret[i].name
           },
         });
-
-        // console.log(
-        //   `${ret[i]._id} ==> Hours: ${ret[i].hours}, Minutes: ${ret[i].minutes}, Seconds: ${ret[i].seconds}`
-        // );
-        // console.log(
-        //   `${ret[i]._id} ==> Hours: ${hours}, Minutes: ${minutes}, Seconds: ${seconds}`
-        // );
       }
     }
   });
 
 
 });
+
 exports.emitter = emitter;

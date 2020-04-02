@@ -12,8 +12,9 @@ export class AppService {
 
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
-  getTasks() {
-    return this.http.get<Array<TaskModel>>(`${this.api}/tasks/`);
+  async getTasks() {
+    const res = await this.http.get<Array<TaskModel>>(`${this.api}/tasks/`);
+    return res;
   }
 
   setTask(task: TaskModel) {
@@ -28,12 +29,15 @@ export class AppService {
     return this.http.put(`${this.api}/tasks/time/${task._id}`, task);
   }
 
-  startTask(task: TaskModel) {
-    return this.http.put<Array<TaskModel>>(`${this.api}/tasks/start/${task._id}`, task);
+  async startTask(task: TaskModel) {
+    return await this.http.put<Array<TaskModel>>(
+      `${this.api}/tasks/start/${task._id}`,
+      task
+    );
   }
 
-  stopTask(task: TaskModel) {
-    return this.http.put(`${this.api}/tasks/stop/${task._id}`, task);
+  async stopTask(task: TaskModel) {
+    return await this.http.put(`${this.api}/tasks/stop/${task._id}`, task);
   }
 
   finsihTask(task: TaskModel) {
@@ -42,13 +46,5 @@ export class AppService {
 
   reopenTask(task: TaskModel) {
     return this.http.put(`${this.api}/tasks/reopen/${task._id}`, task);
-  }
-
-  setCookie(taskList: Array<TaskModel>, TaskQueue: string): void {
-    this.cookieService.set(TaskQueue, JSON.stringify(taskList));
-  }
-
-  getCookie(TaskQueue: string): Array<TaskModel> {
-    return JSON.parse(this.cookieService.get(TaskQueue));
   }
 }

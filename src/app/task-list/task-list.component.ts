@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 export class TaskListComponent implements OnInit {
   TaskStarted: Array<any> = [];
   Tasks: Array<TaskModel> = [];
-
+  Interval;
 
   constructor(private service: AppService) {}
 
@@ -23,6 +23,8 @@ export class TaskListComponent implements OnInit {
     const task = new TaskModel();
     task.name = taskName;
 
+    this.Tasks.push(task);
+
     this.service.setTask(task).subscribe(
       result => {
         Swal.fire(result['title'], result['message'], 'success');
@@ -33,19 +35,6 @@ export class TaskListComponent implements OnInit {
     );
 
     this.ValidationTasks();
-  }
-
-  StopTask(task: TaskModel): void {
-    clearInterval(this.TaskStarted[task._id]);
-
-    this.service.stopTask(task).subscribe(
-      result => {
-        // Note Implemented
-      },
-      er => {
-        Swal.fire(er.title, er.message, 'error');
-      }
-    );
   }
 
   EditTask(task: TaskModel, newName: string): void {
@@ -61,28 +50,14 @@ export class TaskListComponent implements OnInit {
     );
   }
 
-  StartTask(task: TaskModel) {
-    this.service.startTask(task)
-    .subscribe(result => {
-      // Not Implemented
-    }, er => {
-      Swal.fire(er.title, er.message, 'error');
-    });
+  async StopTask(task: TaskModel) {
+    const res = await this.service.stopTask(task);
+    return res.toPromise();
   }
 
-  ValidationTasks() {
-    setInterval(() => {
-      this.service.getTasks().subscribe(
-        result => {
-          this.Tasks = result.filter((el, i, arr) => {
-            return el.done === false;
-          });
-        },
-        er => {
-          Swal.fire(er.title, er.message, 'error');
-        }
-      );
-    }, 1000);
+  async StartTask(task: TaskModel) {
+    const res = await this.service.startTask(task);
+    return res.toPromise();
   }
 
   create(): void {
@@ -135,13 +110,26 @@ export class TaskListComponent implements OnInit {
       confirmButtonText: 'Yes, do it!'
     }).then(result => {
       if (result.value) {
-        this.service.finsihTask(task)
-        .subscribe( result => {
-          Swal.fire(result['title'], result['message'], 'success');
-        }, er => {
-          Swal.fire(er.title, er.message, 'error');
-        });
+        this.service.finsihTask(task).subscribe(
+          result => {
+            Swal.fire(result['title'], result['message'], 'success');
+          },
+          er => {
+            Swal.fire(er.title, er.message, 'error');
+          }
+        );
       }
     });
+  }
+
+  async ValidationTasks() {
+    const data = await this.service.getTasks();
+    this.Interval = setInterval(() => {
+      data.subscribe(result => {
+        this.Tasks = result.filter((el, i, arr) => {
+          return el.done === false;
+        });
+      });
+    }, 1000);
   }
 }
