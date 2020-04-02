@@ -13,6 +13,7 @@ export class TaskListComponent implements OnInit {
   Tasks: Array<TaskModel> = [];
   Interval;
 
+
   constructor(private service: AppService) {}
 
   ngOnInit() {
